@@ -7,7 +7,7 @@ using namespace sc_core;
 
 int sc_main(int argc, char *argv[]) {
   convolution::Layer<char> layer(
-      "layer", 3, 3, convolution::ConvolutionType::SOBER_HORIZONTAL);
+      "layer", 3, 3, convolution::ConvolutionType::SOBER_VERTICAL, 127);
 
   sc_vector<sc_signal<char>> input;
   input.init(9);

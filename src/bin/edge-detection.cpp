@@ -9,10 +9,12 @@ int sc_main(int argc, char *argv[]) {
   convolution::ImageReader<char> reader("image_reader", argv[1]);
   convolution::Layer<char> convolution_layer(
       "convolution_layer", reader.get_output_height(),
-      reader.get_output_width(), convolution::ConvolutionType::LINE_DIAGONAL);
-  convolution::Layer<char> blur_layer(
-      "blur_layer", convolution_layer.get_output_height(),
-      convolution_layer.get_output_width(), convolution::ConvolutionType::BLUR);
+      reader.get_output_width(), convolution::ConvolutionType::SOBER_DIAGONAL,
+      127);
+  convolution::Layer<char> blur_layer("blur_layer",
+                                      convolution_layer.get_output_height(),
+                                      convolution_layer.get_output_width(),
+                                      convolution::ConvolutionType::BLUR, 0);
   ImageWriter<char> writer("image_writer", "output.png",
                            blur_layer.get_output_height(),
                            blur_layer.get_output_width());

@@ -56,6 +56,7 @@ template <typename Type>
 SC_MODULE(Layer) {
   const unsigned int input_height;
   const unsigned int input_width;
+  const Type offset;
   const ConvolutionType convolution_type;
 
   sc_core::sc_port<sc_core::sc_signal_in_if<Type>, 0> input_matrix;
@@ -64,11 +65,12 @@ SC_MODULE(Layer) {
   SC_HAS_PROCESS(Layer);
 
   Layer(sc_core::sc_module_name name, unsigned int input_height,
-        unsigned int input_width, ConvolutionType convolution_type)
+        unsigned int input_width, ConvolutionType convolution_type, Type offset)
       : sc_module(name),
         input_height(input_height),
         input_width(input_width),
-        convolution_type(convolution_type) {
+        convolution_type(convolution_type),
+        offset(offset) {
     SC_METHOD(process);
     sensitive << input_matrix;
   }
@@ -95,7 +97,7 @@ SC_MODULE(Layer) {
           }
         }
         get_output_pixel(curr_x - 1, curr_y - 1)
-            ->write(static_cast<Type>(curr));
+            ->write(static_cast<Type>(curr + offset));
       }
     }
   }
