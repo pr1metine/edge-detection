@@ -13,11 +13,14 @@ set (CMAKE_CXX_STANDARD_REQUIRED ${SystemC_CXX_STANDARD_REQUIRED} CACHE BOOL
      "The with CMAKE_CXX_STANDARD selected C++ standard is a requirement.")
 
 add_library(edge-detection 
-    src/ImageReader.cpp 
-    src/ConvolutionBlock.cpp 
-    src/ConvolutionLayer.cpp)
-target_link_libraries(edge-detection SystemC::systemc ${PNG_LIBRARIES})
+    src/convolution/ImageReader.cpp 
+    )
+target_link_libraries(edge-detection SystemC::systemc ${PNG_LIBRARIES} Boost::boost)
 target_include_directories(edge-detection PUBLIC "include" PRIVATE ${PNG_INCLUDE_DIR})
 
 add_executable(test-block src/bin/test-block.cpp)
 target_link_libraries(test-block edge-detection)
+add_executable(test-image-reader src/bin/test-image-reader.cpp)
+target_link_libraries(test-image-reader edge-detection)
+add_executable(test-convolution-layer src/bin/test-convolution-layer.cpp)
+target_link_libraries(test-convolution-layer edge-detection)
