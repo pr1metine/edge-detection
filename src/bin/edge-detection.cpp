@@ -5,8 +5,20 @@
 #include "convolution/ImageWriter.h"
 #include "convolution/Layer.h"
 
+// Sc_METHOD
+// Ctor
+// Method
+// Doxygen
+// -> zu jeder File
+// -> funktionsbeschreibung
+//
+// Bild ausgabe zu jeder zwischen Stufe
+//
+// TODO: SC FIFO IF selbst implmenentieren
+// sc_vector
 int sc_main(int argc, char *argv[]) {
   convolution::ImageReader<char> reader("image_reader", argv[1]);
+  // TODO: Make it bounded [0; 255]
   convolution::Layer<char> convolution_layer(
       "convolution_layer", reader.get_output_height(),
       reader.get_output_width(), convolution::ConvolutionType::SOBER_DIAGONAL,
