@@ -96,6 +96,10 @@ SC_MODULE(Layer) {
                     get_input_pixel(curr_x - 1 + j, curr_y - 1 + i)->read();
           }
         }
+
+        Type out = std::max(std::numeric_limits<Type>::min(),
+                            std::min(std::numeric_limits<Type>::max(),
+                                     static_cast<Type>(curr + offset)));
         get_output_pixel(curr_x - 1, curr_y - 1)
             ->write(static_cast<Type>(curr + offset));
       }

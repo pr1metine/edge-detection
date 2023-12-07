@@ -21,7 +21,7 @@ int sc_main(int argc, char *argv[]) {
   // TODO: Make it bounded [0; 255]
   convolution::Layer<char> convolution_layer(
       "convolution_layer", reader.get_output_height(),
-      reader.get_output_width(), convolution::ConvolutionType::SOBER_DIAGONAL,
+      reader.get_output_width(), convolution::ConvolutionType::SOBER_HORIZONTAL,
       127);
   convolution::Layer<char> blur_layer("blur_layer",
                                       convolution_layer.get_output_height(),
