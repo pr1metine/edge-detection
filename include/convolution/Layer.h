@@ -53,17 +53,18 @@ SC_MODULE(Layer) {
         for (size_t x = 0; x < get_output_width(); ++x) {
           KernelType curr = offset;
 
-          for (size_t dx = 0; dx < kernel.get_width(); ++dx) {
-            for (size_t dy = 0; dy < kernel.get_height(); ++dy) {
-              curr += kernel.get(dx, dy) * in.get(x + dx, y + dy);
+          for (size_t dy = 0; dy < kernel.get_height(); ++dy) {
+            for (size_t dx = 0; dx < kernel.get_width(); ++dx) {
+              curr += kernel.get(dx, dy) *
+                      static_cast<KernelType>(in.get(x + dx, y + dy));
             }
           }
 
-          if (curr <= MIN) {
+          if (curr <= static_cast<KernelType>(MIN)) {
             out.get_mut(x, y) = MIN;
             continue;
           }
-          if (curr >= MAX) {
+          if (curr >= static_cast<KernelType>(MAX)) {
             out.get_mut(x, y) = MAX;
             continue;
           }

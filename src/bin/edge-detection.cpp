@@ -13,6 +13,13 @@ using namespace sc_core;
 #define PIXEL_TYPE uint8_t
 
 int sc_main(int argc, char *argv[]) {
+  if (argc < 2 || argc > 3) {
+    std::cerr
+        << "usage: edge-detection <path/to/input/png> [<path/to/output/png>]\n";
+    return 1;
+  }
+
+  const char *output_path = argc >= 3 ? argv[2] : "output.png";
   image::ImageReader<PIXEL_TYPE> reader("what", argv[1]);
   convolution::Layer<PIXEL_TYPE> convolution_layer(
       "convolution_layer", reader.get_output_height(),
@@ -25,7 +32,7 @@ int sc_main(int argc, char *argv[]) {
   max_pooling::Layer<PIXEL_TYPE> max_pooling_layer(
       "max_pooling_layer", blur_layer.get_output_height(),
       blur_layer.get_output_width(), 2, 2, 2);
-  image::ImageWriter<PIXEL_TYPE> writer("writer", "output_alt.png",
+  image::ImageWriter<PIXEL_TYPE> writer("writer", output_path,
                                         max_pooling_layer.get_output_height(),
                                         max_pooling_layer.get_output_width());
 
