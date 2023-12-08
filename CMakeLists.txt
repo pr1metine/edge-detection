@@ -18,7 +18,5 @@ add_library(edge-detection-lib
 target_link_libraries(edge-detection-lib SystemC::systemc ${PNG_LIBRARIES} Boost::boost)
 target_include_directories(edge-detection-lib PUBLIC "include" PRIVATE ${PNG_INCLUDE_DIR})
 
-add_executable(test-fifo src/bin/test-fifo.cpp)
-target_link_libraries(test-fifo edge-detection-lib)
 add_executable(edge-detection src/bin/edge-detection.cpp)
 target_link_libraries(edge-detection edge-detection-lib)
