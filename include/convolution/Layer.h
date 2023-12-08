@@ -1,104 +1,77 @@
 #pragma once
 
-#include <iostream>
+#include <systemc>
+#include <vector>
+
+#include "image/Matrix.h"
 
 namespace convolution {
 
-enum class ConvolutionType : size_t {
-  SOBER_HORIZONTAL = 0,
-  SOBER_VERTICAL,
-  SOBER_DIAGONAL,
-  LINE_HORIZONTAL,
-  LINE_VERTICAL,
-  LINE_DIAGONAL,
-  BLUR,
-};
-
-static float kernels[7][3][3] = {
-    {
-        {1.0, 0.0, -1.0},
-        {2.0, 0.0, -2.0},
-        {1.0, 0.0, -1.0},
-    },
-    {
-        {1.0, 2.0, 1.0},
-        {0.0, 0.0, 0.0},
-        {-1.0, 2.0, -1.0},
-    },
-    {
-        {0.0, 1.0, 2.0},
-        {-1.0, 0.0, 1.0},
-        {-2.0, 1.0, 0.0},
-    },
-    {
-        {-1.0, -1.0, -1.0},
-        {2.0, 2.0, 2.0},
-        {-1.0, -1.0, -1.0},
-    },
-    {
-        {-1.0, 2.0, -1.0},
-        {-1.0, 2.0, -1.0},
-        {-1.0, 2.0, -1.0},
-    },
-    {
-        {-1.0, -1.0, 2.0},
-        {-1.0, 2.0, -1.0},
-        {2.0, -1.0, -1.0},
-    },
-    {
-        {-0.111, -0.111, -0.111},
-        {-0.111, -0.111, -0.111},
-        {-0.111, -0.111, -0.111},
-    },
-};
-
-template <typename Type>
+template <typename InputType, typename KernelType = double>
 SC_MODULE(Layer) {
-  const unsigned int input_height;
-  const unsigned int input_width;
-  const Type offset;
-  const ConvolutionType convolution_type;
-
-  sc_core::sc_port<sc_core::sc_signal_in_if<Type>, 0> input_matrix;
-  sc_core::sc_port<sc_core::sc_signal_out_if<Type>, 0> output_matrix;
+  sc_core::sc_fifo_in<image::Matrix<InputType>> input_matrix;
+  sc_core::sc_fifo_out<image::Matrix<InputType>> output_matrix;
+  const size_t input_height;
+  const size_t input_width;
+  const image::Matrix<KernelType> kernel;
+  const InputType offset;
 
   SC_HAS_PROCESS(Layer);
 
-  Layer(sc_core::sc_module_name name, unsigned int input_height,
-        unsigned int input_width, ConvolutionType convolution_type, Type offset)
-      : sc_module(name),
+  Layer(sc_core::sc_module_name name, size_t input_height, size_t input_width,
+        image::Matrix<KernelType> kernel, InputType offset)
+      : kernel(kernel),
+        offset(offset),
         input_height(input_height),
-        input_width(input_width),
-        convolution_type(convolution_type),
-        offset(offset) {
-    SC_METHOD(process);
-    sensitive << input_matrix;
+        input_width(input_width) {
+    assert(kernel.get_height() <= get_input_height());
+    assert(kernel.get_width() <= get_input_width());
+    SC_THREAD(process);
   }
 
-  sc_core::sc_signal_in_if<Type> *get_input_pixel(size_t x, size_t y) {
-    return input_matrix[y * get_input_width() + x];
+  size_t get_input_height() const { return input_height; }
+  size_t get_input_width() const { return input_width; }
+  size_t get_output_height() const {
+    return input_height - kernel.get_height() + 1;
   }
-  sc_core::sc_signal_out_if<Type> *get_output_pixel(size_t x, size_t y) {
-    return output_matrix[y * get_output_width() + x];
+  size_t get_output_width() const {
+    return input_width - kernel.get_width() + 1;
   }
-  unsigned int get_input_height() const { return input_height; }
-  unsigned int get_input_width() const { return input_width; }
-  unsigned int get_output_height() const { return input_height - 2; }
-  unsigned int get_output_width() const { return input_width - 2; }
 
   void process() {
-    for (size_t curr_y = 1; curr_y < input_height - 1; ++curr_y) {
-      for (size_t curr_x = 1; curr_x < input_width - 1; ++curr_x) {
-        float curr = 0;
-        for (size_t i = 0; i < 3; ++i) {
-          for (size_t j = 0; j < 3; ++j) {
-            curr += kernels[static_cast<size_t>(convolution_type)][i][j] *
-                    get_input_pixel(curr_x - 1 + j, curr_y - 1 + i)->read();
+    while (true) {
+      image::Matrix<InputType> in = input_matrix.read();
+      assert(in.get_height() == get_input_height());
+      assert(in.get_width() == get_input_width());
+
+      image::Matrix<InputType> out(get_output_height(), get_output_width());
+      const InputType MIN = std::numeric_limits<InputType>::min();
+      const InputType MAX = std::numeric_limits<InputType>::max();
+
+      for (size_t y = 0; y < get_output_height(); ++y) {
+        for (size_t x = 0; x < get_output_width(); ++x) {
+          KernelType curr = offset;
+
+          for (size_t dx = 0; dx < kernel.get_width(); ++dx) {
+            for (size_t dy = 0; dy < kernel.get_height(); ++dy) {
+              curr += kernel.get(dx, dy) * in.get(x + dx, y + dy);
+            }
           }
+
+          if (curr <= MIN) {
+            out.get_mut(x, y) = MIN;
+            continue;
+          }
+          if (curr >= MAX) {
+            out.get_mut(x, y) = MAX;
+            continue;
+          }
+
+          out.get_mut(x, y) = static_cast<InputType>(curr);
         }
-        get_output_pixel(curr_x - 1, curr_y - 1)
-            ->write(static_cast<Type>(curr + offset));
       }
+
+      output_matrix.nb_write(out);
     }
   }
 };
