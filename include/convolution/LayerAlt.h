@@ -7,19 +7,20 @@
 
 namespace convolution {
 
-template <typename InputType>
+template <typename InputType, typename KernelType = double>
 SC_MODULE(LayerAlt) {
   sc_core::sc_fifo_in<image::Matrix<InputType>> input_matrix;
   sc_core::sc_fifo_out<image::Matrix<InputType>> output_matrix;
   const size_t input_height;
   const size_t input_width;
-  const image::Matrix<float> kernel;
+  const image::Matrix<KernelType> kernel;
   const InputType offset;
 
   SC_HAS_PROCESS(LayerAlt);
 
   LayerAlt(sc_core::sc_module_name name, size_t input_height,
-           size_t input_width, image::Matrix<float> kernel, InputType offset)
+           size_t input_width, image::Matrix<KernelType> kernel,
+           InputType offset)
       : kernel(kernel),
         offset(offset),
         input_height(input_height),
@@ -45,12 +46,12 @@ SC_MODULE(LayerAlt) {
       assert(in.get_width() == get_input_width());
 
       image::Matrix<InputType> out(get_output_height(), get_output_width());
-      const float MIN = std::numeric_limits<InputType>::min();
-      const float MAX = std::numeric_limits<InputType>::max();
+      const InputType MIN = std::numeric_limits<InputType>::min();
+      const InputType MAX = std::numeric_limits<InputType>::max();
 
       for (size_t y = 0; y < get_output_height(); ++y) {
         for (size_t x = 0; x < get_output_width(); ++x) {
-          float curr = 0;
+          KernelType curr = offset;
 
           for (size_t dx = 0; dx < kernel.get_width(); ++dx) {
             for (size_t dy = 0; dy < kernel.get_height(); ++dy) {
@@ -58,8 +59,16 @@ SC_MODULE(LayerAlt) {
             }
           }
 
-          out.get_mut(x, y) = static_cast<InputType>(
-              std::max(MIN, std::min(MAX, curr + offset)));
+          if (curr <= MIN) {
+            out.get_mut(x, y) = MIN;
+            continue;
+          }
+          if (curr >= MAX) {
+            out.get_mut(x, y) = MAX;
+            continue;
+          }
+
+          out.get_mut(x, y) = static_cast<InputType>(curr);
         }
       }
 
