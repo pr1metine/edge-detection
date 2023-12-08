@@ -20,7 +20,8 @@ SC_MODULE(Layer) {
 
   Layer(sc_core::sc_module_name name, size_t input_height, size_t input_width,
         image::Matrix<KernelType> kernel, InputType offset)
-      : kernel(kernel),
+      : sc_module(name),
+        kernel(kernel),
         offset(offset),
         input_height(input_height),
         input_width(input_width) {

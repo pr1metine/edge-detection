@@ -8,12 +8,12 @@
 #include "image/Matrix.h"
 
 namespace image {
-template <typename Type>
+template <typename InputType, typename ImageType = boost::gil::gray8_image_t>
 SC_MODULE(ImageWriter) {
   const std::string path_to_png;
   const unsigned int input_height;
   const unsigned int input_width;
-  sc_core::sc_fifo_in<image::Matrix<Type>> input_matrix;
+  sc_core::sc_fifo_in<image::Matrix<InputType>> input_matrix;
 
   SC_HAS_PROCESS(ImageWriter);
 
@@ -24,13 +24,12 @@ SC_MODULE(ImageWriter) {
         input_height(input_height),
         input_width(input_width) {
     SC_THREAD(process);
-    sensitive << input_matrix;
   }
 
   void process() {
     while (true) {
       auto input = input_matrix.read();
-      boost::gil::gray8_image_t out(input_width, input_height);
+      ImageType out(input_width, input_height);
       auto v = view(out);
 
       for (size_t y = 0; y < v.dimensions().y; ++y) {
