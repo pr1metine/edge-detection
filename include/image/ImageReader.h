@@ -1,3 +1,13 @@
+/**
+ * @file ImageReader.h
+ * @author Quang Thanh Ta (ta.quang_thanh-it21@it.dhbw-ravensburg.de)
+ * @brief Header file for image reader class
+ * @version 0.1
+ * @date 2023-12-15
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #pragma once
 
 #include <boost/gil.hpp>
@@ -27,8 +37,8 @@ template <typename MatrixType, typename ImageType = boost::gil::gray8_image_t>
 struct ImageReader : ::sc_core::sc_module {
   std::string path_to_png;
   ImageType image;
-  unsigned int output_height;
-  unsigned int output_width;
+  size_t output_height;
+  size_t output_width;
 
   sc_core::sc_fifo_out<image::Matrix<MatrixType>> output_matrix;
 

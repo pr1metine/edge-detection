@@ -1,6 +1,6 @@
 # SystemC Module for Image Edge Detection
 
-![Overview](./edge-detection-overview.drawio.png)
+![Overview](./edge-detection-overview.drawio-4.png)
 
 As part of a Hardware-Software-Codesign lecture, TSL21 is tasked with achieving edge detection on a PNG picture using convolution and Sobel / Edge kernels.
 

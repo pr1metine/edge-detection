@@ -35,8 +35,8 @@ namespace convolution {
  * @note  SC_MODULE(Layer) Define macro has been manually expanded because
  * doxygen would not work otherwise
  *
- * @tparam MatrixType
- * @tparam KernelType
+ * @tparam MatrixType Element type of input and output matrix
+ * @tparam KernelType Element type of kernel matrix
  */
 template <typename MatrixType, typename KernelType = double>
 struct Layer : ::sc_core::sc_module {

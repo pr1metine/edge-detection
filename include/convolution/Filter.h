@@ -1,7 +1,7 @@
 /**
  * @file Filter.h
  * @author Quang Thanh Ta (ta.quang_thanh-it21@it.dhbw-ravensburg.de)
- * @brief Various filter kernels to be used for convolution
+ * @brief Header file for various filter kernels to be used for convolution
  *
  * @version 0.1
  * @date 2023-12-10
