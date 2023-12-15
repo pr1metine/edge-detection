@@ -8,9 +8,16 @@ This is the example picture:
 
 ![Input](./Input.png)
 
-This is the output when using the Sobel kernel for detecting vertical edges:
+This is the output when using various kernel filters:
 
-![output](./output.png)
+| Filter argument    | Output image                                              |
+| ------------------ | --------------------------------------------------------- |
+| `sobel_horizontal` | ![output_sobel_horizontal](./output_sobel_horizontal.png) |
+| `sobel_vertical`   | ![output_sobel_vertical](./output_sobel_vertical.png)     |
+| `sobel_diagonal`   | ![output_sobel_diagonal](./output_sobel_diagonal.png)     |
+| `edge_horizontal`  | ![output_edge_horizontal](./output_edge_horizontal.png)   |
+| `edge_vertical`    | ![output_edge_vertical](./output_edge_vertical.png)       |
+| `edge_diagonal`    | ![output_edge_diagonal](./output_edge_diagonal.png)       |
 
 ## Resources
 

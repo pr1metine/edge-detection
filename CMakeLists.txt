@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27.7)
+cmake_minimum_required(VERSION 3.16.3)
 project("edge-detection")
 
 set (CMAKE_PREFIX_PATH /opt/homebrew/Cellar/systemc/2.3.4)

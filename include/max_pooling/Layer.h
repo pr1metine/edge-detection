@@ -5,11 +5,10 @@
 
 namespace max_pooling {
 
-template <typename InputType>
-// SC_MODULE(Layer), public pipeline::Pass<InputType> {
+template <typename MatrixType>
 SC_MODULE(Layer) {
-  sc_core::sc_fifo_in<image::Matrix<InputType>> input_matrix;
-  sc_core::sc_fifo_out<image::Matrix<InputType>> output_matrix;
+  sc_core::sc_fifo_in<image::Matrix<MatrixType>> input_matrix;
+  sc_core::sc_fifo_out<image::Matrix<MatrixType>> output_matrix;
   const size_t input_height;
   const size_t input_width;
   const size_t pooling_height;
@@ -47,13 +46,13 @@ SC_MODULE(Layer) {
 
   void process() {
     while (true) {
-      image::Matrix<InputType> in = input_matrix.read();
+      image::Matrix<MatrixType> in = input_matrix.read();
 
-      image::Matrix<InputType> out(get_output_height(), get_output_width());
+      image::Matrix<MatrixType> out(get_output_height(), get_output_width());
 
       for (size_t y = 0; y < get_output_height(); ++y) {
         for (size_t x = 0; x < get_output_width(); ++x) {
-          InputType curr = std::numeric_limits<InputType>::min();
+          MatrixType curr = std::numeric_limits<MatrixType>::min();
           for (size_t dy = 0; dy < pooling_height; ++dy) {
             for (size_t dx = 0; dx < pooling_width; ++dx) {
               curr = std::max(curr, in.get(x * pooling_width + dx,
