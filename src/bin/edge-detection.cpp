@@ -1,3 +1,13 @@
+/**
+ * @file edge-detection.cpp
+ * @author Quang Thanh Ta (ta.quang_thanh-it21@it.dhbw-ravensburg.de)
+ * @brief CLI entrypoint for detecting edges in a PNG image
+ * @version 0.1
+ * @date 2023-12-15
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include <iostream>
 #include <systemc>
 
@@ -10,8 +20,19 @@
 
 using namespace sc_core;
 
+/**
+ * @brief Element type of a matrix containing image information
+ */
 #define PIXEL_TYPE uint8_t
 
+/**
+ * @brief Get filter kernel based on specified string.
+ *
+ * @throw std::invalid_argument Thrown if no filter kernel was found for the
+ * given filter name.
+ * @param filter Name of filter kernel
+ * @return image::Matrix<double> Desired filter kernel
+ */
 image::Matrix<double> getFilterFromCommandLine(std::string filter) {
   if (filter == "sobel_horizontal") {
     return convolution::sobel::create_horizontal_filter_kernel();
@@ -34,6 +55,14 @@ image::Matrix<double> getFilterFromCommandLine(std::string filter) {
   throw std::invalid_argument("Invalid filter argument");
 }
 
+/**
+ * @brief Main function serving as the entry point of the CLI tool
+ * `edge-detection`
+ *
+ * @param argc Number of arguments
+ * @param argv Arguments
+ * @return int Return code
+ */
 int sc_main(int argc, char *argv[]) {
   if (argc < 3 || argc > 4) {
     std::cerr << "usage: edge-detection <filter> <path/to/input/png> "
@@ -49,7 +78,7 @@ int sc_main(int argc, char *argv[]) {
     return 1;
   }
 
-  const char *output_path = argc >= 4 ? argv[3] : "output.png";
+  const char *output_path = argc == 4 ? argv[3] : "output.png";
   image::ImageReader<PIXEL_TYPE> reader("reader", argv[2]);
   convolution::Layer<PIXEL_TYPE> convolution_layer(
       "convolution_layer", reader.get_output_height(),

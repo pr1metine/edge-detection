@@ -60,19 +60,38 @@ struct ImageWriter : ::sc_core::sc_module {
   }
 
   /**
+   * @brief Retrieve expected height of input matrix.
+   *
+   * @return size_t Height of input matrix
+   */
+  size_t get_input_height() const { return input_height; }
+  /**
+   * @brief Retrieve expected width of input matrix.
+   *
+   * @return size_t Width of input matrix
+   */
+  size_t get_input_width() const { return input_width; }
+
+  /**
    * @brief If a new input matrix is received, turn it to a Boost GIL image and
    * save it to the specified position.
    *
    */
   void process() {
     while (true) {
-      auto input = input_matrix.read();
+      auto in = input_matrix.read();
+      if (in.get_height() != get_input_height() &&
+          in.get_width() != get_input_width()) {
+        throw std::invalid_argument(
+            "Dimensions of input matrix does not match expected input "
+            "dimensions");
+      }
       ImageType out(input_width, input_height);
       auto v = view(out);
 
       for (size_t y = 0; y < v.dimensions().y; ++y) {
         for (size_t x = 0; x < v.dimensions().x; ++x) {
-          v(x, y) = input.get(x, y);
+          v(x, y) = in.get(x, y);
         }
       }
 

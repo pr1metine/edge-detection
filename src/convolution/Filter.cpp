@@ -1,3 +1,14 @@
+/**
+ * @file Filter.cpp
+ * @author Quang Thanh Ta (ta.quang_thanh-it21@it.dhbw-ravensburg.de)
+ * @brief Source file containing function implementations for creating filter
+ * kernels
+ * @version 0.1
+ * @date 2023-12-15
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include "convolution/Filter.h"
 
 namespace convolution {

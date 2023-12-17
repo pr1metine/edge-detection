@@ -35,7 +35,7 @@ namespace image {
  */
 template <typename MatrixType, typename ImageType = boost::gil::gray8_image_t>
 struct ImageReader : ::sc_core::sc_module {
-  std::string path_to_png;
+  const std::string path_to_png;
   ImageType image;
   size_t output_height;
   size_t output_width;
