@@ -1,8 +1,8 @@
 # SystemC Module for Image Edge Detection
 
-![Overview](./edge-detection-overview.drawio-4.png)
-
 As part of a Hardware-Software-Codesign lecture, TSL21 is tasked with achieving edge detection on a PNG picture using convolution and Sobel / Edge kernels.
+
+## Example
 
 This is the example picture:
 
@@ -10,7 +10,7 @@ This is the example picture:
 
 This is the output when using various kernel filters:
 
-| Filter argument    | Output image                                              |
+| Filter type        | Output image                                              |
 | ------------------ | --------------------------------------------------------- |
 | `sobel_horizontal` | ![output_sobel_horizontal](./output_sobel_horizontal.png) |
 | `sobel_vertical`   | ![output_sobel_vertical](./output_sobel_vertical.png)     |
@@ -18,6 +18,49 @@ This is the output when using various kernel filters:
 | `edge_horizontal`  | ![output_edge_horizontal](./output_edge_horizontal.png)   |
 | `edge_vertical`    | ![output_edge_vertical](./output_edge_vertical.png)       |
 | `edge_diagonal`    | ![output_edge_diagonal](./output_edge_diagonal.png)       |
+
+## Compiling
+
+The following compiling process assumes a MacOS host. Similar steps must be followed on other hosts. Note that all source code is in the [`src` folder](./src/) and [`include` folder](./include/) shall be added to the include path.
+
+### Prerequisites
+
+- VS Code + C/C++ Extension Pack
+- Boost GIL
+- libpng
+- SystemC 2.3.4
+- CMake
+
+### Steps
+
+1. Open this project as a folder in VS Code
+
+   - For Visual Studio, CLion, etc., import this project as a CMake project
+
+2. Configure CMake Project
+3. Build all CMake targets
+
+## Usage
+
+Building this project produces the executable / command line tool `edge-detection`. Given [a specific filter type](#example) and a file path to an input PNG image, this command line tool applys the given edge detection filter type to a PNG image and saving the resulting image as a PNG file. By default, this image is saved as `output.png`. The path to the output image may be overwritten.
+
+```
+usage: edge-detection <filter> <path/to/input/png> [<path/to/output/png>]
+
+filter:
+        sobel_horizontal
+        sobel_vertical
+        sobel_diagonal
+        edge_horizontal
+        edge_vertical
+        edge_diagonal
+```
+
+## Software Architecture
+
+![Overview](./edge-detection-overview.drawio-5.png)
+
+`edge-detection` passes images through a pipeline as shown in the picture above. Each box corresponds to a SystemC module. Refer to their Doxygen documentation for more information. Inside the pipeline, the image is encoded in a separate structure, i.e., [`image::Matrix`](./include/image/Matrix.h). Given a path to an image, [`image::ImageReader`](./include/image/ImageReader.h) reads the image at the designated path, turns it into an `image::Matrix`, and passes it through the pipeline. A [`convolution::Layer`](./include/convolution/Layer.h) applies the [user given filter](./src/bin/edge-detection.cpp) onto the image. This image is, then, blurred by another `convolution::Layer`. Afterwards, [`max_pooling::Layer`](./include/max_pooling/Layer.h) reduces the image dimensions. Finally, the image is saved using [`image::ImageWriter`](./include/image/ImageWriter.h).
 
 ## Fragen
 
